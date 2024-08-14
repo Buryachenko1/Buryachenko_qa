@@ -1,0 +1,109 @@
+{
+	"info": {
+		"_postman_id": "8c2daec8-e039-4595-8831-181b5a133ba1",
+		"name": "PUT/news/tags/{id}",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32654029",
+		"_collection_link": "https://livesport-api.postman.co/workspace/EB's-WS~a2d7e1f6-9e51-4f46-8423-99f394a64c86/collection/32654029-8c2daec8-e039-4595-8831-181b5a133ba1?action=share&source=collection_link&creator=32654029"
+	},
+	"item": [
+		{
+			"name": "PW - Create Tag - non-existing UUID",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(\"***** RUNNING NEWS API PUT TAG - Create Tag - non-existing UUID *****\");",
+							"",
+							"pm.collectionVariables.set(\"tag_uuid\", pm.variables.replaceIn('{{$guid}}'));",
+							"pm.collectionVariables.set(\"label\", \"tag label for UUID case\");",
+							"",
+							"console.log(\"Sending ID as UUID \" + pm.collectionVariables.get(\"tag_uuid\"));",
+							"console.log(\"Sending tag label as \" + pm.collectionVariables.get(\"label\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// define const and variables",
+							"const response = pm.response.json();",
+							"const schema = {",
+							"    \"type\": \"object\",",
+							"    \"properties\": {",
+							"        \"id\": { \"type\": \"string\" },",
+							"        \"label\": { \"type\": \"string\" },",
+							"        \"legacyEntityType\": { \"type\": \"string\" },",
+							"        \"legacyEntityID\": { \"type\": \"string\" },",
+							"    },",
+							"    \"required\": [\"id\", \"label\", \"legacyEntityType\", \"legacyEntityID\"]",
+							"};",
+							"let expected_status_code = 200,",
+							"    expected_tag_id = pm.collectionVariables.get(\"tag_uuid\"),",
+							"    expected_uuid_format = /^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/,",
+							"    expected_label = pm.collectionVariables.get(\"label\"),",
+							"    expected_le_type = \"\",",
+							"    expected_le_id = \"\";",
+							"",
+							"// verify response status code",
+							"pm.test(\"Status code is \" + expected_status_code, function () {",
+							"    pm.expect(pm.response.code).to.equal(expected_status_code);",
+							"});",
+							"// verify response body",
+							"pm.test(\"Response has correct schema\", function () {",
+							"    pm.expect(response).to.have.jsonSchema(schema);",
+							"});",
+							"pm.test(\"Tag ID is UUID format\", function () {",
+							"    pm.expect(response.id).to.match(expected_uuid_format);",
+							"});",
+							"pm.test(\"Tag ID is correct as \" + expected_tag_id, function () {",
+							"    pm.expect(response.id).to.be.equal(expected_tag_id);",
+							"});",
+							"pm.test(\"Tag label is correct as \" + expected_label, function () {",
+							"    pm.expect(response.label).to.be.equal(expected_label);",
+							"});",
+							"pm.test(\"Tag legacy entity type is correct as \" + expected_le_type, function () {",
+							"    pm.expect(response.legacyEntityType).to.be.equal(expected_le_type);",
+							"});",
+							"pm.test(\"Tag legacy entity id is correct as \" + expected_le_id, function () {",
+							"    pm.expect(response.legacyEntityID).to.be.equal(expected_le_id);",
+							"});",
+							"",
+							"// call next test case in row",
+							"postman.setNextRequest(\"Update Tag - existing UUID\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"label\": \"{{label}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{input_api_server}}/news/tags/{{tag_uuid}}",
+					"host": [
+						"{{input_api_server}}"
+					],
+					"path": [
+						"news",
+						"tags",
+						"{{tag_uuid}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
